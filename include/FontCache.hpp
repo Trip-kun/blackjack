@@ -1,5 +1,6 @@
 #pragma once
 #include <ft2build.h>
+#include <filesystem>
 #include FT_FREETYPE_H
 #include <iostream>
 
@@ -15,7 +16,7 @@ namespace Fonts {
             std::cout << "Could not init freetype library" << std::endl;
             throw "FREETYPE INIT ERROR";
         }
-         roboto = loadFont("/home/trip-kun/cpp2/sem/src/Roboto-Medium.ttf");
+         roboto = loadFont("Roboto-Medium.ttf");
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -45,7 +45,7 @@ int main() {
   std::cout << Shaders::basicV->getInfo() << std::endl;
   std::cout << Shaders::textF->getInfo() << std::endl;
   std::cout << Shaders::textV->getInfo() << std::endl;
-  Texture texture("/home/trip-kun/Downloads/bee.png");
+  Texture texture("img/back.png");
   Image image(&texture, program, -0.5, -0.5, 1, 1);
   Image image2(&texture, program, -1, -1, 0.5, 0.5);
   Image image3(&texture, program, -1, 0.5, 0.5, 0.5);
@@ -61,10 +61,10 @@ int main() {
   Deck fdeck(deckd, deckc);
   Cards::load();
   VisualCard::setBackImage(Cards::backImage);
-  Texture frontFace("/home/trip-kun/cpp2/sem/src/img/ace_clubs.png");
+  Texture frontFace("img/ace_clubs.png");
   VisualCard vcard(Card::Face::ACE, Card::Suit::SPADES, &frontFace, program, 0, 0, 1.2);
   Fonts::init();
-  Text text(Shaders::text, Fonts::roboto, "Hello, World", 25.0, 25.0, 1.0, 1.0, 1.0, 1.0);
+  Text text(Shaders::text, Fonts::roboto, "Hello, World!", 25.0, 25.0, 1.0, 1.0, 1.0, 1.0);
   vcard.Move(-0.5, -0.5);
   vcard.Flip();
   bool finished=false;
