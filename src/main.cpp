@@ -1,3 +1,4 @@
+#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -15,12 +16,11 @@
 #include "Text.hpp"
 #include "Texture.hpp"
 #include "VisualCard.hpp"
-
 void processInput(GLFWwindow *window);
 void windowSizeCallback(GLFWwindow* window, int width, int height);
 std::pair<double, double> getOpenGLMouseCoords(GLFWwindow *window);
 int main() {
-  Blackjack blackjack;
+  //Blackjack blackjack;
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -35,7 +35,7 @@ int main() {
   glfwMakeContextCurrent(window);
   GLenum err = glewInit();
   glfwSetWindowSizeCallback(window, windowSizeCallback);
-  //Shaders
+
   Context* ctx = new Context();
   Shaders::load(ctx);
   GLProgram* program = Shaders::texture;
@@ -107,7 +107,6 @@ std::pair<double, double> getOpenGLMouseCoords(GLFWwindow *window) {
   double y = (-2 * (yScreen / height)) + 1;
   return {x, y};
 }
-
 void windowSizeCallback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }

@@ -4,7 +4,7 @@ project(KMblackjack)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 set (CMAKE_CXX_STANDARD 17)
 add_executable(${PROJECT_NAME} ./src/main.cpp
@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME} ./src/main.cpp
         include/FontCache.hpp
         src/Text.cpp
         include/Text.hpp)
+set (GLEW_VERBOSE 1)
 target_include_directories(${PROJECT_NAME} PUBLIC ./include/)
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(glfw3 3.3 REQUIRED)
@@ -39,9 +40,8 @@ find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(Freetype REQUIRED)
+find_package(soil REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::GL)
-target_link_libraries(${PROJECT_NAME} PUBLIC GLEW::glew)
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
-target_link_libraries(${PROJECT_NAME} PUBLIC /usr/local/lib/libSOIL.a)
 target_link_libraries(${PROJECT_NAME} PUBLIC Freetype::Freetype)
+

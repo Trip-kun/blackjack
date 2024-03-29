@@ -1,4 +1,5 @@
 #pragma once
+#define GLEW_STATIC
 #include <Shader.hpp>
 #include <GL/glew.h>
 #include "Context.hpp"
