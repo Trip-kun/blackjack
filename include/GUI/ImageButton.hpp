@@ -13,20 +13,17 @@ template <typename T> class ImageButton : public Image, public Element<T> {
         return {B.x-A.x, B.y-A.y};
     }
 public:
-    ImageButton(Texture *texture, GLProgram *program, float x, float y, float width, float height, float r, float g, float b) : Image(texture, program, x, y, width, height, r, g, b) {
+    ImageButton(Texture *texture, GLProgram *program, Position position, Color color) : Image(texture, program, position, color) {
         this->lastClick=0;
         this->lastRelease=0;
-        this->x=x;
-        this->y=y;
-        this->width=width;
-        this->height=height;
+        this->position=position;
     }
     void Click(double button, double x, double y, T t) override {
         glm::vec4 click = glm::vec4(x, y, 0, 1);
         glm::vec4 P = this->trans*click;
-        glm::vec4 bottomLeft = glm::vec4(this->x, this->y, 0, 1);
-        glm::vec4 bottomRight = glm::vec4(this->x+this->width, this->y, 0, 1);
-        glm::vec4 topRight = glm::vec4(this->x+this->width, this->y+this->height, 0, 1);
+        glm::vec4 bottomLeft = glm::vec4(this->position.x, this->position.y, 0, 1);
+        glm::vec4 bottomRight = glm::vec4(this->position.x+this->position.width, this->position.y, 0, 1);
+        glm::vec4 topRight = glm::vec4(this->position.x+this->position.width, this->position.y+this->position.height, 0, 1);
         glm::vec4 A = this->trans*bottomLeft;
         glm::vec4 B = this->trans*bottomRight;
         glm::vec4 C = this->trans*topRight;
@@ -47,9 +44,9 @@ public:
     void Release(double button, double x, double y, T t) override {
         glm::vec4 click = glm::vec4(x, y, 0, 1);
         glm::vec4 P = this->trans*click;
-        glm::vec4 bottomLeft = glm::vec4(this->x, this->y, 0, 1);
-        glm::vec4 bottomRight = glm::vec4(this->x+this->width, this->y, 0, 1);
-        glm::vec4 topRight = glm::vec4(this->x+this->width, this->y+this->height, 0, 1);
+        glm::vec4 bottomLeft = glm::vec4(this->position.x, this->position.y, 0, 1);
+        glm::vec4 bottomRight = glm::vec4(this->position.x+this->position.width, this->position.y, 0, 1);
+        glm::vec4 topRight = glm::vec4(this->position.x+this->position.width, this->position.y+this->position.height, 0, 1);
         glm::vec4 A = this->trans*bottomLeft;
         glm::vec4 B = this->trans*bottomRight;
         glm::vec4 C = this->trans*topRight;
@@ -82,7 +79,7 @@ public:
         this->onReleases.erase(id);
     }
 private:
-    float x, y, width, height;
+    Position position;
     std::map<unsigned int, void (*)(T)> onClicks;
     std::map<unsigned int, void (*)(T)> onReleases;
     unsigned int lastClick, lastRelease;;

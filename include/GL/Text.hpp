@@ -5,15 +5,15 @@
 #include <string>
 #include "Drawable.hpp"
 #include "Font.hpp"
-
+#include "GL/Transforms.hpp"
 class Text : Drawable {
 public:
-    Text(GLProgram* program, Font* font,  const char* text, float x, float y, float scale, float r, float g, float b);
+    Text(GLProgram* program, Font* font,  const char* text, double x, double y, double scale, Color color);
     void Draw(Context* ctx) override;
-    void setPosition(float x, float y);
+    void setOffset(double x, double y);
     void setText(const char* text);
-    void setColor(float r, float g, float b);
-    void setScale(float scale);
+    void setColor(Color color);
+    void setScale(double scale);
     static void setHeight(unsigned int);
     static void setWidth(unsigned int);
     ~Text() override;
@@ -24,9 +24,9 @@ private:
     static unsigned int height;
     GLProgram* program;
     std::string text;
-    float x, y;
-    float r, g, b;
-    float scale;
+    double x, y;
+    Color color;
+    double scale;
     Font* font;
 };
 

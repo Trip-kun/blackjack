@@ -35,6 +35,7 @@ add_executable(${PROJECT_NAME} ./src/main.cpp
         include/GL/Text.hpp
         include/GUI/Element.hpp
         include/GUI/ImageButton.hpp
+        include/GL/Transforms.hpp
 )
 set (GLEW_VERBOSE 1)
 target_include_directories(${PROJECT_NAME} PUBLIC ./include/)

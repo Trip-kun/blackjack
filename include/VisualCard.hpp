@@ -12,7 +12,7 @@ public:
         MOVE, STILL
     };
     static void setBackImage(Texture* texture);
-    VisualCard(Card::Face face, Card::Suit suit, Texture* texture, GLProgram* program, float x, float y, float scale);
+    VisualCard(Card::Face face, Card::Suit suit, Texture* texture, GLProgram* program, double x, double y, double scale);
     void Draw(Context*) override;
     void Flip();
     void Move(double x, double y);
@@ -28,8 +28,8 @@ private:
     static Texture* backImage;
     std::chrono::time_point<std::chrono::system_clock> startFlip, startMove;
     Texture* frontImage;
-    const float width = 0.3/ (1280.0/720.0);
-    const float height = 0.42;
+    const double width = 0.3/ (1280.0/720.0);
+    const double height = 0.42;
     double xOffset=0;
     double yOffset=0;
     double goalX=0;

@@ -4,14 +4,14 @@ Texture* VisualCard::backImage = nullptr;
 void VisualCard::setBackImage(Texture* texture) {
     backImage = texture;
 }
-VisualCard::VisualCard(Card::Face face, Card::Suit suit, Texture *texture, GLProgram* program, float x, float y,  float scale) {
+VisualCard::VisualCard(Card::Face face, Card::Suit suit, Texture *texture, GLProgram* program, double x, double y,  double scale) {
     this->face=face;
     this->suit=suit;
     this->frontImage=texture;
     this->fullScale=scale;
     this->startX = x;
     this->startY = y;
-    this->image=new Image(texture, program, x, y, width*scale, height*scale);
+    this->image=new Image(texture, program, {x, y, width*scale, height*scale});
 }
 void VisualCard::Draw(Context* ctx) {
     std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
@@ -64,8 +64,8 @@ void VisualCard::Draw(Context* ctx) {
             break;
         }
     }
-    image->setPosition(moveOffsetX, moveOffsetY+flipOffset);
-    image->setScale(moveScale, flipScale);
+    image->setOffset(moveOffsetX, moveOffsetY+flipOffset);
+    image->setTransform({ moveScale, flipScale, 0});
     if (isBack) {
         image->setTexture(backImage);
     } else {

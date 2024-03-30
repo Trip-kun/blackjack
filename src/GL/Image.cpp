@@ -1,21 +1,19 @@
 #include "GL/Image.hpp"
 
-Image::Image(Texture* texture, GLProgram* program, float x, float y, float w, float h, float r, float g, float b) {
+Image::Image(Texture* texture, GLProgram* program, Position pos, Color color ) {
     this->texture=texture;
     this->program=program;
-    this->ox=x;
-    this->oy=y;
-    this->x=x;
-    this->y=y;
+    this->x=pos.x;
+    this->y=pos.y;
     unsigned int* iS = new unsigned int[]{
         0, 1, 3,
         1, 2, 3
         };
-    float* vS = new float[]{
-        x+w, y+h, r, g, b, 1.0, 1.0,
-        x+w, y, r, g, b, 1.0, 0.0,
-        x, y, r, g, b, 0.0, 0.0,
-        x, y+h, r, g, b, 0.0, 1.0
+    double* vS = new double[]{
+        pos.x+pos.width, pos.y+pos.height, color.r, color.g, color.b, 1.0, 1.0,
+        pos.x+pos.width, pos.y, color.r, color.g, color.b, 1.0, 0.0,
+        pos.x, pos.y, color.r, color.g, color.b, 0.0, 0.0,
+        pos.x, pos.y+pos.height, color.r, color.g, color.b, 0.0, 1.0
         };
     this->vertices=vS;
     this->indices=iS;
@@ -28,14 +26,14 @@ Image::Image(Texture* texture, GLProgram* program, float x, float y, float w, fl
     this->EBO=EBO;
     glBindVertexArray(this->VAO);
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-    glBufferData(GL_ARRAY_BUFFER, 28*sizeof(float), this->vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 28*sizeof(double), this->vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*sizeof(int), this->indices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 7 * sizeof(double), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2*sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 7 * sizeof(double), (void*)(2*sizeof(double)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*) (5*sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_DOUBLE, GL_FALSE, 7 * sizeof(double), (void*) (5*sizeof(double)));
     glEnableVertexAttribArray(2);
     this->trans = glm::mat4(1.0f);
 }
@@ -52,18 +50,13 @@ void Image::Draw(Context* ctx) {
     glBindVertexArray(this->VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
-void Image::setPosition(float x, float y) {
+void Image::setOffset(double x, double y) {
     this->x = x;
     this->y = y;
     this->resetTrans();
 }
-void Image::setRotation(float r) {
-    this->r = r;
-    this->resetTrans();
-}
-void Image::setScale(float sx, float sy) {
-    this->sx = sx;
-    this->sy = sy;
+void Image::setTransform(Transform transform) {
+    this->transform = transform;
     this->resetTrans();
 }
 void Image::setTexture(Texture *texture) {
@@ -72,7 +65,7 @@ void Image::setTexture(Texture *texture) {
 
 void Image::resetTrans() {
     this->trans = glm::mat4(1.0f);
-    this->trans = glm::translate(trans, glm::vec3(this->x-this->ox, this->y-this->oy, 0));
-    this->trans = glm::rotate(trans, glm::radians(this->r), glm::vec3(0.0, 0.0, 1.0));
-    this->trans = glm::scale(trans, glm::vec3(this->sx, this->sy, 1));
+    this->trans = glm::translate(trans, glm::vec3(this->x-this->pos.x, this->y-this->pos.y, 0));
+    this->trans = glm::rotate(trans, (float) glm::radians(this->transform.r), glm::vec3(0.0, 0.0, 1.0));
+    this->trans = glm::scale(trans, glm::vec3(this->transform.sx, this->transform.sy, 1));
 }
