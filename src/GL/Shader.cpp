@@ -1,7 +1,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "Shader.hpp"
+#include "GL/Shader.hpp"
 #include <fstream>
 #include <iostream>
 #include <sstream>

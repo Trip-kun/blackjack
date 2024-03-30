@@ -1,4 +1,4 @@
-#include "GLProgram.hpp"
+#include "GL/GLProgram.hpp"
 GLProgram::GLProgram(Shader* shader) {
   this->program = glCreateProgram();
   glAttachShader(this->program, shader->shader);

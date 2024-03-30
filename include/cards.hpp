@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Texture.hpp"
+#include "GL/Texture.hpp"
 namespace Cards {
     Texture* backImage;
     void load() {

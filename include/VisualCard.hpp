@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
-#include "Drawable.hpp"
-#include "Image.hpp"
+#include "GL/Drawable.hpp"
+#include "GL/Image.hpp"
 #include "Card.hpp"
 class VisualCard : public Drawable {
 public:

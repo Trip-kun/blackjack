@@ -1,4 +1,4 @@
-#include "Text.hpp"
+#include "GL/Text.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 unsigned int Text::VAO, Text::VBO;

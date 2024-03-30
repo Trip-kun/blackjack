@@ -1,6 +1,6 @@
 #pragma once
-#include "Drawable.hpp"
-#include "Image.hpp"
+#include "GL/Drawable.hpp"
+#include "GL/Image.hpp"
 
 class Menu : Drawable{
 public:

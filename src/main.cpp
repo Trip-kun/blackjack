@@ -4,17 +4,17 @@
 #include <iostream>
 #include <Blackjack.hpp>
 #include <chrono>
-#include <Shader.hpp>
-#include <GLProgram.hpp>
+#include <GL/Shader.hpp>
+#include <GL/GLProgram.hpp>
 #include <SOIL/SOIL.h>
-#include <shaders.hpp>
+#include <GL/shaders.hpp>
 
 #include "cards.hpp"
 #include "Deck.hpp"
 #include "FontCache.hpp"
-#include "Image.hpp"
-#include "Text.hpp"
-#include "Texture.hpp"
+#include "GL/Image.hpp"
+#include "GL/Text.hpp"
+#include "GL/Texture.hpp"
 #include "VisualCard.hpp"
 void processInput(GLFWwindow *window);
 void windowSizeCallback(GLFWwindow* window, int width, int height);

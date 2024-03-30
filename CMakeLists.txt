@@ -9,16 +9,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 set (CMAKE_CXX_STANDARD 17)
 add_executable(${PROJECT_NAME} ./src/main.cpp
         src/Blackjack.cpp
-        src/Shader.cpp
-        src/GLProgram.cpp
-        src/Context.cpp
-        include/Context.hpp
-        src/Texture.cpp
-        include/Texture.hpp
-        include/Drawable.hpp
-        include/shaders.hpp
-        src/Image.cpp
-        include/Image.hpp
+        src/GL/Shader.cpp
+        src/GL/GLProgram.cpp
+        src/GL/Context.cpp
+        include/GL/Context.hpp
+        src/GL/Texture.cpp
+        include/GL/Texture.hpp
+        include/GL/Drawable.hpp
+        include/GL/shaders.hpp
+        src/GL/Image.cpp
+        include/GL/Image.hpp
         include/Card.hpp
         include/Deck.hpp
         src/VisualCard.cpp
@@ -27,11 +27,11 @@ add_executable(${PROJECT_NAME} ./src/main.cpp
         include/cards.hpp
         src/Menu.cpp
         include/Menu.hpp
-        src/Font.cpp
-        include/Font.hpp
+        src/GL/Font.cpp
+        include/GL/Font.hpp
         include/FontCache.hpp
-        src/Text.cpp
-        include/Text.hpp)
+        src/GL/Text.cpp
+        include/GL/Text.hpp)
 set (GLEW_VERBOSE 1)
 target_include_directories(${PROJECT_NAME} PUBLIC ./include/)
 set(OpenGL_GL_PREFERENCE GLVND)

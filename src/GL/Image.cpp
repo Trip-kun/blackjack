@@ -1,4 +1,4 @@
-#include "Image.hpp"
+#include "GL/Image.hpp"
 
 #include <iostream>
 

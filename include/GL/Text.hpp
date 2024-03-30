@@ -1,6 +1,6 @@
 #pragma once
 #define GLEW_STATIC
-#include <GLProgram.hpp>
+#include "GL/GLProgram.hpp"
 
 #include "Drawable.hpp"
 #include "Font.hpp"

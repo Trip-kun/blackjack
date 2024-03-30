@@ -1,4 +1,4 @@
-#include "Context.hpp"
+#include "GL/Context.hpp"
 
 void Context::useProgram(unsigned int program) {
     if (program!=this->activeProgram) {

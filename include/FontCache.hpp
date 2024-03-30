@@ -4,7 +4,7 @@
 #include FT_FREETYPE_H
 #include <iostream>
 
-#include "Font.hpp"
+#include "GL/Font.hpp"
 
 
 namespace Fonts {
