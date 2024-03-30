@@ -1,7 +1,7 @@
 #pragma once
 #include <ft2build.h>
 #include <glm/vec2.hpp>
-#include "GL/glew.h"
+#include <GL/glew.h>
 #include FT_FREETYPE_H
 class Font {
 public:

@@ -1,10 +1,10 @@
 #pragma once
 #define GLEW_STATIC
+#include <GL/glew.h>
 #include "GL/GLProgram.hpp"
-
+#include <string>
 #include "Drawable.hpp"
 #include "Font.hpp"
-#include "GL/glew.h"
 
 class Text : Drawable {
 public:
@@ -14,10 +14,14 @@ public:
     void setText(const char* text);
     void setColor(float r, float g, float b);
     void setScale(float scale);
+    static void setHeight(unsigned int);
+    static void setWidth(unsigned int);
     ~Text() override;
 private:
     static unsigned int VAO, VBO;
     static bool initialized;
+    static unsigned int width;
+    static unsigned int height;
     GLProgram* program;
     std::string text;
     float x, y;

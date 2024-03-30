@@ -32,6 +32,7 @@ FT_Face face;
         return f;
     }
     void clean() {
+        delete roboto;
         FT_Done_FreeType(library);
     }
 }

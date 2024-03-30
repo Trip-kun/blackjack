@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME} ./src/main.cpp
         src/GL/Context.cpp
         include/GL/Context.hpp
         src/GL/Texture.cpp
+        include/STATE/Gamestate.hpp
         include/GL/Texture.hpp
         include/GL/Drawable.hpp
         include/GL/shaders.hpp
@@ -25,13 +26,16 @@ add_executable(${PROJECT_NAME} ./src/main.cpp
         include/VisualCard.hpp
         include/tween.hpp
         include/cards.hpp
-        src/Menu.cpp
-        include/Menu.hpp
+        src/STATE/Menu.cpp
+        include/STATE/Menu.hpp
         src/GL/Font.cpp
         include/GL/Font.hpp
         include/FontCache.hpp
         src/GL/Text.cpp
-        include/GL/Text.hpp)
+        include/GL/Text.hpp
+        include/GUI/Element.hpp
+        include/GUI/ImageButton.hpp
+)
 set (GLEW_VERBOSE 1)
 target_include_directories(${PROJECT_NAME} PUBLIC ./include/)
 set(OpenGL_GL_PREFERENCE GLVND)

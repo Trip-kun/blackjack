@@ -1,8 +1,7 @@
 #pragma once
+#include <glm/gtc/type_ptr.hpp>
 #include "Shader.hpp"
 #include "GLProgram.hpp"
-#include <iostream>
-#include <glm/gtc/type_ptr.hpp>
 
 namespace Shaders {
     const char * basicVertex = "#version 330 core\n"
@@ -83,5 +82,16 @@ namespace Shaders {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glUniformMatrix4fv(text->getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    }
+    void inline clean(Context* ctx) {
+        delete basicV;
+        delete basicF;
+        delete textureV;
+        delete textureF;
+        delete textV;
+        delete textF;
+        delete basic;
+        delete texture;
+        delete text;
     }
 }

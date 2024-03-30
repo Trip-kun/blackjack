@@ -1,7 +1,5 @@
 #include "GL/Image.hpp"
 
-#include <iostream>
-
 Image::Image(Texture* texture, GLProgram* program, float x, float y, float w, float h, float r, float g, float b) {
     this->texture=texture;
     this->program=program;

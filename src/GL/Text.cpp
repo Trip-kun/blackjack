@@ -1,6 +1,8 @@
-#include "GL/Text.hpp"
-
 #include <glm/gtc/type_ptr.hpp>
+
+#include "GL/Text.hpp"
+unsigned int Text::width = 1280;
+unsigned int Text::height = 720;
 unsigned int Text::VAO, Text::VBO;
 bool Text::initialized = false;
 Text::Text(GLProgram* program, Font* font, const char* text, float x, float y, float scale, float r, float g, float b) {
@@ -19,8 +21,8 @@ Text::Text(GLProgram* program, Font* font, const char* text, float x, float y, f
     this->program = program;
     this->font = font;
     this->text = text;
-    this->x = x;
-    this->y = y;
+    this->x = ((x+1.0f)/2.0f)*width;;
+    this->y = ((y+1.0f)/2.0f)*height;
     this->scale = scale;
     this->r = r;
     this->g = g;
@@ -81,6 +83,12 @@ void Text::setColor(float r, float g, float b) {
 }
 void Text::setScale(float scale) {
     this->scale = scale;
+}
+void Text::setHeight(unsigned int height) {
+    Text::height = height;
+}
+void Text::setWidth(unsigned int width) {
+    Text::width = width;
 }
 Text::~Text() {
 }

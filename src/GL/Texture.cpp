@@ -1,4 +1,5 @@
 #include "GL/Texture.hpp"
+
 Texture::Texture(const char* filename) {
     glGenTextures(1, &this->texture);
     glBindTexture(GL_TEXTURE_2D, this->texture);

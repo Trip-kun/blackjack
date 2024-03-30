@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#define GLEW_STATIC
 #include <GL/glew.h>
 class Shader {
 public:

@@ -1,10 +1,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "GL/Shader.hpp"
 #include <fstream>
-#include <iostream>
-#include <sstream>
+#include "GL/Shader.hpp"
 Shader::Shader(const char* source, GLenum type) {
   this->shader = glCreateShader(type);
   glShaderSource(this->shader, 1, &source, NULL);

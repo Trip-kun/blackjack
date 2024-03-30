@@ -1,7 +1,3 @@
-//
-// Created by trip-kun on 3/25/24.
-//
-
 #include "VisualCard.hpp"
 #include "tween.hpp"
 Texture* VisualCard::backImage = nullptr;

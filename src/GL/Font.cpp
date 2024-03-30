@@ -1,8 +1,6 @@
-
+#include <iostream>
 
 #include "GL//Font.hpp"
-
-#include <iostream>
 
 Font::Font(FT_Face face, int size) {
     this->face=face;
