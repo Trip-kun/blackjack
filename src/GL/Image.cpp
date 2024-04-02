@@ -28,7 +28,7 @@ Image::Image(Texture* texture, GLProgram* program, Position pos, Color color ) {
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
     glBufferData(GL_ARRAY_BUFFER, 28*sizeof(double), this->vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*sizeof(int), this->indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*sizeof(unsigned int), this->indices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 7 * sizeof(double), (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 7 * sizeof(double), (void*)(2*sizeof(double)));
@@ -48,6 +48,7 @@ void Image::Draw(Context* ctx) {
     unsigned int transformLoc = program->getUniformLocation("transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
     glBindVertexArray(this->VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 void Image::setOffset(double x, double y) {

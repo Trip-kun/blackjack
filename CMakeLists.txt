@@ -36,6 +36,11 @@ add_executable(${PROJECT_NAME} ./src/main.cpp
         include/GUI/Element.hpp
         include/GUI/ImageButton.hpp
         include/GL/Transforms.hpp
+        include/GUI/TextImageButton.hpp
+        src/STATE/Game.cpp
+        include/STATE/Game.hpp
+        include/GL/Hexic.hpp
+        src/GL/Hexic.cpp
 )
 set (GLEW_VERBOSE 1)
 target_include_directories(${PROJECT_NAME} PUBLIC ./include/)

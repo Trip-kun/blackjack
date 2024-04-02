@@ -1,4 +1,7 @@
 #include "GL/GLProgram.hpp"
+
+#include <iostream>
+
 GLProgram::GLProgram(Shader* shader) {
   this->program = glCreateProgram();
   glAttachShader(this->program, shader->shader);
@@ -27,5 +30,6 @@ void GLProgram::use(Context* ctx) {
 }
 
 unsigned int GLProgram::getUniformLocation(const char * uniform) {
-  return glGetUniformLocation(this->program, uniform);
+  unsigned int loc = glGetUniformLocation(this->program, uniform);
+  return loc;
 }
