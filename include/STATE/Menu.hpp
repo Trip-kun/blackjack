@@ -2,7 +2,7 @@
 #include "Game.hpp"
 #include "GL/Hexic.hpp"
 #include "STATE/Gamestate.hpp"
-#include "GUI/TextImageButton.hpp"
+#include "GUI/HexicImageButton.hpp"
 #include "GL/Image.hpp"
 #include "GL/Text.hpp"
 
@@ -11,7 +11,7 @@ public:
     explicit Menu(GLFWwindow* window, GLProgram* program, GLProgram* textProgram, GLProgram* basicProgram, Fonts* fonts);
     void Render(Context* ctx) override;
     void Update(double deltaTime) override;
-    void HandleInput() override;
+    void HandleInput(KeyFrame*) override;
     void Enter() override;
     void Exit() override;
     void WindowSizeCallback(double width, double height) override;
@@ -22,10 +22,9 @@ public:
 private:
     Image* logo;
     Texture* logoTexture;
-    TextImageButton<Menu*>* startButton;
+    HexicImageButton<Menu*>* startButton;
     GLFWwindow* window;
-    TextImageButton<Menu*>* exitButton;
+    HexicImageButton<Menu*>* exitButton;
     Gamestate* nextState = nullptr;
-    Hexic* hexic;
     Game* game;
 };

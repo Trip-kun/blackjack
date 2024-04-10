@@ -29,5 +29,7 @@ private:
     void processInput();
     static int width, height;
     std::chrono::time_point<std::chrono::high_resolution_clock> lastTime = std::chrono::high_resolution_clock::now();
-    int leftButton, rightButton, middleButton = GLFW_RELEASE;
+    int leftButton, rightButton, middleButton;
+    KeyFrame* oldFrame;
+    bool frameStarted=false;
 };

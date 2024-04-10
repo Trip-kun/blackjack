@@ -6,7 +6,7 @@ public:
         ACE, DUECE, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING
     };
     enum Suit {
-        HEARTS, DIAMONDS, CLUBS, SPADES
+        CLUBS, SPADES, HEARTS, DIAMONDS
     };
     Card(Suit suit, Face face) {
         this->suit=suit;
@@ -18,7 +18,8 @@ public:
     Suit getSuit() {
         return this->suit;
     }
-private:
+    virtual ~Card() = default;
+protected:
     Face face;
     Suit suit;
 };

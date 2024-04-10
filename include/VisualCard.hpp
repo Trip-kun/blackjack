@@ -3,7 +3,7 @@
 #include "GL/Drawable.hpp"
 #include "GL/Image.hpp"
 #include "Card.hpp"
-class VisualCard : public Drawable {
+class VisualCard : public Drawable, public Card {
 public:
     enum flipAnim {
         FLIP, NONE, FLIPBACK
@@ -12,7 +12,7 @@ public:
         MOVE, STILL
     };
     static void setBackImage(Texture* texture);
-    VisualCard(Card::Face face, Card::Suit suit, Texture* texture, GLProgram* program, double x, double y, double scale);
+    VisualCard(Face face, Suit suit, Texture* texture, GLProgram* program, double x, double y, double scale);
     void Draw(Context*) override;
     void Flip();
     void Move(double x, double y);
@@ -22,8 +22,6 @@ public:
 private:
     bool isBack = true;
     Image* image;
-    Card::Face face{};
-    Card::Suit suit{};
     double fullScale;
     static Texture* backImage;
     std::chrono::time_point<std::chrono::system_clock> startFlip, startMove;

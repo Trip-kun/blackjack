@@ -1,23 +1,27 @@
 #pragma once
 #include "FontCache.hpp"
 #include "ImageButton.hpp"
-#include "GL/Drawable.hpp"
 #include "GL/Text.hpp"
+#include "GL/Drawable.hpp"
+#include "GL/Hexic.hpp"
 #include "GUI/Element.hpp"
 template <typename T>
-class TextImageButton : public Drawable, public Element<T> {
+class HexicImageButton : public Drawable, public Element<T> {
     ImageButton<T>* button;
+    Hexic* hexic;
     Text* text;
-    static unsigned int textureOffset;
+    static double textureOffset;
     static unsigned int width;
     static unsigned int height;
 public:
-    TextImageButton(Texture* texture, GLProgram* programTexture, GLProgram* programText, Fonts* fonts, const char * first_text, Position pos, Color color = {1, 1, 1}) {
-        button = new ImageButton<T>(texture, programTexture, pos, color);
+    HexicImageButton(GLProgram* programBasic, GLProgram* programText, Fonts* fonts, const char* first_text, Position pos, Color color = {1, 1, 1}) {
+        button = new ImageButton<T>(nullptr, nullptr, pos, color); // This will NOT be drawing
         unsigned int fontSize = (height*pos.height)*(256-2.75*textureOffset)/(256);
         text = new Text(programText, fonts->getFont(fontSize),  first_text, pos.x+(((textureOffset*1.0f)/256)*pos.width/2),
                                                                                                    pos.y+(((textureOffset*1.0f)/256)*pos.height/1.15),
                                                                               1.0, color);
+
+        hexic = new Hexic(programBasic, pos, color);
     }
     static void setTextureOffset(int offset) {
         textureOffset=offset;
@@ -29,19 +33,18 @@ public:
         height=_height;
     }
     void Draw(Context* ctx) override {
-        button->Draw(ctx);
+        hexic->Draw(ctx);
         text->Draw(ctx);
     }
     void setOffset(double x, double y) {
         button->setOffset(x, y);
+        hexic->setOffset(x, y);
         text->setOffset(x+(textureOffset/width), y+(textureOffset/height));
     }
     void setTransform(Transform transform) {
         button->setTransform(transform);
+        hexic->setTransform(transform);
         text->setScale(transform.sy);
-    }
-    void setTexture(Texture* texture) {
-        button->setTexture(texture);
     }
     void setText(const char* text) {
         this->text->setText(text);
@@ -72,15 +75,14 @@ public:
     void removeOnRelease(unsigned int id) {
         button->removeOnRelease(id);
     }
-    ~TextImageButton() override {
+    ~HexicImageButton() override {
         delete button;
         delete text;
     }
-
 };
 template <typename T>
-unsigned int TextImageButton<T>::textureOffset=50;
+double HexicImageButton<T>::textureOffset=50;
 template <typename T>
-unsigned int TextImageButton<T>::width=0;
+unsigned int HexicImageButton<T>::width=0;
 template <typename T>
-unsigned int TextImageButton<T>::height=0;
+unsigned int HexicImageButton<T>::height=0;

@@ -4,7 +4,7 @@ Texture* VisualCard::backImage = nullptr;
 void VisualCard::setBackImage(Texture* texture) {
     backImage = texture;
 }
-VisualCard::VisualCard(Card::Face face, Card::Suit suit, Texture *texture, GLProgram* program, double x, double y,  double scale) {
+VisualCard::VisualCard(Face face, Suit suit, Texture *texture, GLProgram* program, double x, double y,  double scale): Card(suit, face) {
     this->face=face;
     this->suit=suit;
     this->frontImage=texture;

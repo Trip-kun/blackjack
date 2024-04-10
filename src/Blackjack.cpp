@@ -17,6 +17,7 @@ Blackjack::Blackjack() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
     this->window = glfwCreateWindow(1280, 720, "Hello, World", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -41,8 +42,8 @@ Blackjack::Blackjack() {
     std::cout <<"Text Vertex Shader: " << Shaders::textV->getInfo() << std::endl;
     program->use(context);
     glEnable(GL_BLEND);
-
-    Cards::load();
+    glEnable(GL_MULTISAMPLE);
+    Cards::getCards();
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     fonts = new Fonts();
@@ -122,12 +123,13 @@ void Blackjack::Run() {
     std::cout << "Gambling Time is Over!" << std::endl;
 }
 Blackjack::~Blackjack() {
-    Cards::clean();
+    delete Cards::getCards();
     Shaders::clean(context);
     fonts->clean();
     delete context;
     delete menu;
     delete fonts;
+    delete oldFrame;
     glfwTerminate();
 }
 void Blackjack::windowSizeCallback(GLFWwindow *window, int width, int height) {
@@ -154,8 +156,6 @@ std::pair<double, double> Blackjack::getOpenGLMouseCoords(GLFWwindow *window) {
     return {x, y};
 }
 void Blackjack::processInput() {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
     int left = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
     int right = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
     int middle = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
@@ -180,5 +180,13 @@ void Blackjack::processInput() {
             currentState->Click(GLFW_MOUSE_BUTTON_MIDDLE, getOpenGLMouseCoords(window).first, getOpenGLMouseCoords(window).second);
         middleButton = middle;
     }
-    currentState->HandleInput();
+
+    KeyFrame* frame = new KeyFrame; // Frame pointers need to aleternate between frames to prevent reuse of the same address in the next frame
+    currentState->HandleInput(frame);
+    if (!frameStarted) {
+        frameStarted=true;
+    } else {
+        delete oldFrame;
+    }
+    oldFrame=frame;
 }
