@@ -13,6 +13,13 @@ double getX(int count) {
     }
     return (out/2.0)+ ((count)/2)*(-out/2.0);
 }
+double getSplitX(int count, bool isLeft) {
+    double out = getX(count);
+    if (isLeft) {
+        return out-0.5;
+    }
+    return out+0.5;
+}
 double countValue(std::vector<VisualCard*>* hand) {
     int value=0;
     int numAces=0;
@@ -74,9 +81,21 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
     this-> hitButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Hit", {-1, -1, 1.0/3.0, 0.1}, {1, 1, 1});
     this->hitButton->onClick([](Game *game) {
         if (game->phase==PLAYER && !game->hasHit) {
-            game->playerHand.emplace_back(*(game->deck.begin()));
-            game->playerHand.back()->Move(getX(game->playerHand.size()), -0.9);
-            game->playerHand.back()->Flip();
+            if (!game->isSplit) {
+                game->playerHand.emplace_back(*(game->deck.begin()));
+                game->playerHand.back()->Move(getX(game->playerHand.size()), -0.9);
+                game->playerHand.back()->Flip();
+            } else {
+                if (game->split_phase==LEFT) {
+                    game->splitHand.emplace_back(*(game->deck.begin()));
+                    game->splitHand.back()->Move(getSplitX(game->splitHand.size(), true), -0.9);
+                    game->splitHand.back()->Flip();
+                } else {
+                    game->playerHand.emplace_back(*(game->deck.begin()));
+                    game->playerHand.back()->Move(getSplitX(game->playerHand.size(), false), -0.9);
+                    game->playerHand.back()->Flip();
+                }
+            }
             game->deck.erase(game->deck.begin());
             game->hasHit=true;
             game->phase=HIT;
@@ -85,21 +104,69 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
     this-> standButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Stand", {-(2.0/3.0), -1, 1.0/3.0, 0.1}, {1, 1, 1});
     this->standButton->onClick([](Game *game) {
         if (game->phase==PLAYER) {
+
             game->phase=DEALER;
+            if (game->split_phase==LEFT) {
+                game->split_phase=RIGHT;
+                game->phase = PLAYER;
+            }
         }
     });
     this-> splitButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Split", {-(1.0/3.0), -1, 1.0/3.0, 0.1}, {1, 1, 1});
     this->splitButton->onClick([](Game *game) {
         if (game->phase==PLAYER) {
+            if (game->playerHand[0]->getFace()==game->playerHand[1]->getFace()) {
+                if (game->bet>game->balance) {
+                    game->highBetSource=DOUBLE;
+                    game->phase=HIGHBET;
+                    return;
+                }
+                game->balance-=game->bet;
+                game->splitHand.emplace_back(game->playerHand[1]);
+                game->playerHand.pop_back();
+                game->splitHand[0]->Move(getSplitX(1, true), -0.9);
+                game->playerHand[0]->Move(getSplitX(1, false), -0.9);
 
+                game->playerHand.emplace_back(*(game->deck.begin()));
+                game->deck.erase(game->deck.begin());
+                game->playerHand.back()->Flip();
+                game->splitHand.emplace_back(*(game->deck.begin()));
+                game->deck.erase(game->deck.begin());
+                game->splitHand.back()->Flip();
+                game->playerHand.back()->Move(getSplitX(2, false), -0.9);
+                game->splitHand.back()->Move(getSplitX(2, true), -0.9);
+                game->isSplit=true;
+                game->phase=SPLIT;
+            }
         }
     });
     this-> doubleButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Double", {0, -1, 1.0/3.0, 0.1}, {1, 1, 1});
     this->doubleButton->onClick([](Game *game) {
-        if (game->phase==PLAYER) {
-            game->playerHand.emplace_back(*(game->deck.begin()));
-            game->playerHand.back()->Move(getX(game->playerHand.size()), -0.9);
-            game->playerHand.back()->Flip();
+        if (game->phase==PLAYER && (game->split_phase==LEFT ? game->splitHand.size() : game->playerHand.size())==2) {
+            if (game->bet>game->balance) {
+                game->highBetSource=DOUBLE;
+                game->phase=HIGHBET;
+                return;
+            }
+            game->balance-=game->bet;
+            if (!game->isSplit) {
+                game->playerHand.emplace_back(*(game->deck.begin()));
+                game->playerHand.back()->Move(getX(game->playerHand.size()), -0.9);
+                game->playerHand.back()->Flip();
+                game->rightDoubled=true;
+            } else {
+                if (game->split_phase==LEFT) {
+                    game->splitHand.emplace_back(*(game->deck.begin()));
+                    game->splitHand.back()->Move(getSplitX(game->splitHand.size(), true), -0.9);
+                    game->splitHand.back()->Flip();
+                    game->leftDoubled=true;
+                } else {
+                    game->playerHand.emplace_back(*(game->deck.begin()));
+                    game->playerHand.back()->Move(getSplitX(game->playerHand.size(), false), -0.9);
+                    game->playerHand.back()->Flip();
+                    game->rightDoubled=true;
+                }
+            }
             game->deck.erase(game->deck.begin());
             game->hasHit=true;
             game->isDouble=true;
@@ -109,6 +176,12 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
     this-> insureButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Insure", {(1.0/3.0), -1, 1.0/3.0, 0.1}, {1, 1, 1});
     this->insureButton->onClick([](Game *game) {
         if (game->phase==PLAYER_INSURE) {
+            if (game->bet/2>game->balance) {
+                game->highBetSource=INSURANCE;
+                game->phase=HIGHBET;
+                return;
+            }
+            game->balance-=game->bet/2;
             game->hasInsured=true;
             game->phase=PLAYER;
             if (countValue(&game->dealerHand)==21) {
@@ -120,6 +193,9 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
     this->dontInsureButton->onClick([](Game *game) {
         if (game->phase==PLAYER_INSURE) {
             game->phase=PLAYER;
+            if (countValue(&game->dealerHand)==21) {
+                game->phase=DEALER;
+            }
         }
     });
     this-> dealButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Deal", {(2.0/3.0), -1, 1.0/3.0, 0.1}, {1, 1, 1});
@@ -127,10 +203,64 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
         if (game->phase==END) {
             game->hasInsured=false;
             game->isFirstRound=false;
+            if (game->bet>game->balance) {
+                game->highBetSource=START;
+                game->phase=HIGHBET;
+                return;
+            }
+            game->balance-=game->bet;
+            game->isDouble=false;
             game->phase=DEALING;
         }
     });
-    winnerLabel = new HexicImageButton<Game*>(textProgram, textProgram, fonts, "", {0, 0, 1.0/3.0, 0.1}, {1, 1, 1});
+    winnerLabel = new HexicImageButton<Game*>(textProgram, textProgram, fonts, "", {-0.5, 0.5, 1.0/3.0, 0.1}, {1, 1, 1});
+    splitLabel = new HexicImageButton<Game*>(textProgram, textProgram, fonts, "", {-0.5, 0.6, 1.0/3.0, 0.1}, {1, 1, 1});
+    balanceLabel = new HexicImageButton<Game*>(textProgram, textProgram, fonts, "Balance: $1000", {-0.5, 0.7, 1.0/3.0, 0.1}, {1, 1, 1});
+    betLabel = new HexicImageButton<Game*>(textProgram, textProgram, fonts, "Bet (Min $2): $20", {-0.5, 0.8, 1.0/3.0, 0.1}, {1, 1, 1});
+    incrementBet = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "+", {0, 0.8, 1.0/3.0, 0.1}, {1, 1, 1});
+    this->incrementBet->onClick([](Game *game) {
+        if (game->phase==END) {
+            if (game->bet+2<=game->balance) {
+                game->bet+=2;
+                game->betLabel->setText((std::string("Bet (Min $2): $") + std::to_string(game->bet)).c_str());
+            }
+        }
+    });
+    decrementBet = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "-", {-1, 0.8, 1.0/3.0, 0.1}, {1, 1, 1});
+    this->decrementBet->onClick([](Game *game) {
+        if (game->phase==END) {
+            if (game->bet-2>0) {
+                game->bet-=2;
+                game->betLabel->setText((std::string("Bet (Min $2): $") + std::to_string(game->bet)).c_str());
+            }
+        }
+    });
+    highBetLabel = new HexicImageButton<Game*>(textProgram, textProgram, fonts, "You can't afford that bet!", {-0.5, 0.4, 1.0/3.0, 0.1}, {1, 1, 1});
+    restartButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Restart", {-0.5, 0.4, 1.0/3.0, 0.1}, {1, 1, 1});
+    this->restartButton->onClick([](Game *game) {
+        if (game->phase==LOSE) {
+            game->balance=1000;
+            game->bet=20;
+            game->elapsedShuffleTime=0.0;
+            game->shuffleFinished=false;
+            game->shuffleStarted=false;
+            game->phase=SHUFFLE;
+        }
+    });
+    okayButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Okay", {0, 0, 1.0/3.0, 0.1}, {1, 1, 1});
+    this->okayButton->onClick([](Game *game) {
+        if (game->phase==HIGHBET) {
+            if (game->highBetSource==START) {
+                game->phase=COLLECTING;
+            }
+            if (game->highBetSource==DOUBLE) {
+                game->phase=PLAYER;
+            }
+            if (game->highBetSource==INSURANCE) {
+                game->phase=PLAYER;
+            }
+        }
+    });
 }
 void Game::Render(Context *ctx) {
     glClearColor((53.0f/255.0f), (101.0f/255.0f), (77.0f/255.0f), 1.0f);
@@ -140,6 +270,9 @@ void Game::Render(Context *ctx) {
         card->Draw(ctx);
     }
     for (auto &card : dealerHand) {
+        card->Draw(ctx);
+    }
+    for (auto &card : splitHand) {
         card->Draw(ctx);
     }
     c=0;
@@ -153,6 +286,10 @@ void Game::Render(Context *ctx) {
         if (c++>this->max) break;
     }
     exitButton->Draw(ctx);
+    balanceLabel->setText((std::string("Balance: $") + std::to_string(balance)).c_str());
+    balanceLabel->Draw(ctx);
+    betLabel->setText((std::string("Bet (Min $2): $") + std::to_string(bet)).c_str());
+    betLabel->Draw(ctx);
     if (phase==PLAYER) {
         hitButton->Draw(ctx);
         standButton->Draw(ctx);
@@ -161,6 +298,21 @@ void Game::Render(Context *ctx) {
             if (playerHand[0]->getFace()==playerHand[1]->getFace())
                 splitButton->Draw(ctx);
         }
+        if (split_phase!=NONE) {
+            if (split_phase==LEFT) {
+                splitLabel->setText("Left");
+            } else {
+                splitLabel->setText("Right");
+            }
+            splitLabel->Draw(ctx);
+        }
+    }
+    if (phase==HIGHBET) {
+        highBetLabel->Draw(ctx);
+        okayButton->Draw(ctx);
+    }
+    if (phase==LOSE) {
+        restartButton->Draw(ctx);
     }
     if (phase==PLAYER_INSURE) {
         insureButton->Draw(ctx);
@@ -168,6 +320,8 @@ void Game::Render(Context *ctx) {
     }
     if (phase==END) {
         dealButton->Draw(ctx);
+        incrementBet->Draw(ctx);
+        decrementBet->Draw(ctx);
         if (isWinner) {
             winnerLabel->Draw(ctx);
         }
@@ -225,6 +379,8 @@ void Game::Update(double deltaTime) {
     }
     if (phase==DEALING) {
         if (!dealStarted) {
+            this->isSplit=false;
+            this->split_phase=NONE;
             playerHand.emplace_back(*deck.begin());
             playerHand[0]->Move(getX(playerHand.size()), -0.9);
             playerHand[0]->Flip();
@@ -259,19 +415,40 @@ void Game::Update(double deltaTime) {
             }
         }
     }
-    if (phase==HIT) {
+    if (phase==HIT)  {
         if (hasHit) {
             hitTime+=deltaTime;
             if (hitTime>shuffleTime) {
+                std::vector<VisualCard*>* hand;
+                if (!isSplit) {
+                    hand=&playerHand;
+                } else {
+                    if (split_phase==LEFT) {
+                        hand=&splitHand;
+                    } else {
+                        hand=&playerHand;
+                    }
+                }
                 hasHit=false;
                 hitTime=0.0;
-                if (countValue(&playerHand)>21) {
+                if (countValue(hand)>21) {
+                    this->isDouble=false;
                     phase=DEALER;
+                    if (this->isSplit) {
+                        if (split_phase==LEFT) {
+                            split_phase=RIGHT;
+                            phase = PLAYER;
+                        }
+                    }
                 } else {
                     phase=PLAYER;
                     if (this->isDouble) {
                         this->isDouble=false;
                         phase=DEALER;
+                        if (split_phase==LEFT) {
+                            split_phase=RIGHT;
+                            phase = PLAYER;
+                        }
                     }
                 }
             }
@@ -298,20 +475,75 @@ void Game::Update(double deltaTime) {
     }
     if (phase==COLLECTING) {
         if (!startCollecting) {
-            if (playerHand.size()==2 && countValue(&playerHand)==21 && countValue(&dealerHand)!=21) {
-                winnerLabel->setText("Blackjack!");
-            } else if (countValue(&playerHand)>21) {
-                winnerLabel->setText("Dealer Wins!");
-            } else if (countValue(&dealerHand)>21) {
-                winnerLabel->setText("Player Wins!");
-            } else if (countValue(&playerHand)>countValue(&dealerHand)) {
-                winnerLabel->setText("Player Wins!");
-            } else if (countValue(&playerHand)<countValue(&dealerHand)) {
-                winnerLabel->setText("Dealer Wins!");
-            } else {
-                winnerLabel->setText("Push!");
+            if (!isSplit) {
+                if (playerHand.size()==2 && countValue(&playerHand)==21 && (countValue(&dealerHand)!=21 || dealerHand.size()>2)) {
+                    balance+=bet*2.5 * (this->rightDoubled ? 2 : 1);
+                    winnerLabel->setText("Blackjack!");
+                } else if (countValue(&playerHand)>21) {
+                    winnerLabel->setText("Dealer Wins!");
+                } else if (countValue(&dealerHand)>21) {
+                    balance+=bet*2* (this->rightDoubled ? 2 : 1);
+                    winnerLabel->setText("Player Wins!");
+                } else if (countValue(&playerHand)>countValue(&dealerHand)) {
+                    balance+=2*bet* (this->rightDoubled ? 2 : 1);
+                    winnerLabel->setText("Player Wins!");
+                } else if (countValue(&playerHand)<countValue(&dealerHand)) {
+                    winnerLabel->setText("Dealer Wins!");
+                } else {
+                    balance+=bet* (this->rightDoubled ? 2 : 1);
+                    winnerLabel->setText("Push!");
+                }
+            } else
+                {
+                std::string winner1;
+                std::string winner2;
+                if (countValue(&playerHand)==21 && (countValue(&dealerHand)!=21 || dealerHand.size()>2)) {
+                    this->balance+=bet*2.5* (this->rightDoubled ? 2 : 1);
+                    winner1="Player Blackjack!";
+                } else if (countValue(&playerHand)>21) {
+                    winner1="Dealer Wins!";
+                } else if (countValue(&dealerHand)>21) {
+                    this->balance+=bet*2* (this->rightDoubled ? 2 : 1);
+                    winner1="Player Wins!";
+                } else if (countValue(&playerHand)>countValue(&dealerHand)) {
+                    this->balance+=2*bet* (this->rightDoubled ? 2 : 1);
+                    winner1="Player Wins!";
+                } else if (countValue(&playerHand)<countValue(&dealerHand)) {
+                    winner1="Dealer Wins!";
+                } else {
+                    this->balance+=bet* (this->rightDoubled ? 2 : 1);
+                    winner1="Push!";
+                }
+                if (countValue(&splitHand)==21 && (countValue(&dealerHand)!=21 || dealerHand.size()>2)) {
+                    this->balance+=2.5*bet* (this->leftDoubled ? 2 : 1);
+                    winner2="Player Blackjack!";
+                } else if (countValue(&splitHand)>21) {
+                    winner2="Dealer Wins!";
+                } else if (countValue(&dealerHand)>21) {
+                    this->balance+=2*bet* (this->leftDoubled ? 2 : 1);
+                    winner2="Player Wins!";
+                } else if (countValue(&splitHand)>countValue(&dealerHand)) {
+                    this->balance+=2*bet* (this->leftDoubled ? 2 : 1);
+                    winner2="Player Wins!";
+                } else if (countValue(&splitHand)<countValue(&dealerHand)) {
+                    winner2="Dealer Wins!";
+                } else {
+                    this->balance+=bet* (this->leftDoubled ? 2 : 1);
+                    winner2="Push!";
+                }
+                if (hasInsured) {
+                    if (countValue(&dealerHand)==21 && dealerHand.size()==2) {
+                        balance+=2*bet;
+                    }
+                }
+                winnerLabel->setText((std::string("Left: ") + winner2 + std::string("\nRight: ") + winner1).c_str());
             }
             for (auto &card : playerHand) {
+                discard.push_back(card);
+                card->Move(0.15/ (1280.0/720.0), 0);
+                card->Flip();
+            }
+            for (auto &card : splitHand) {
                 discard.push_back(card);
                 card->Move(0.15/ (1280.0/720.0), 0);
                 card->Flip();
@@ -324,11 +556,16 @@ void Game::Update(double deltaTime) {
             max=1000;
             startCollecting=true;
             playerHand.clear();
+            splitHand.clear();
             dealerHand.clear();
         } else {
             collectTime+=deltaTime;
             if (collectTime>shuffleTime) {
                 collectTime=0.0;
+                if (balance<2) {
+                    phase=LOSE;
+                    return;
+                }
                 if (discard.size()>=52*5) {
                     startCollecting=false;
                     max=5;
@@ -347,6 +584,14 @@ void Game::Update(double deltaTime) {
     if (phase==END) {
         if (!isFirstRound && isWinner==false) {
             isWinner = true;
+        }
+    }
+    if (phase==SPLIT) {
+        splitTimer+=deltaTime;
+        if (splitTimer>shuffleTime) {
+            splitTimer=0.0;
+            phase=PLAYER;
+            split_phase = LEFT;
         }
     }
 }
@@ -375,6 +620,10 @@ void Game::Click(double button, double x, double y) {
     insureButton->Click(button, x, y, this);
     dontInsureButton->Click(button, x, y, this);
     dealButton->Click(button, x, y, this);
+    incrementBet->Click(button, x, y, this);
+    decrementBet->Click(button, x, y, this);
+    restartButton->Click(button, x, y, this);
+    okayButton->Click(button, x, y, this);
 }
 void Game::Release(double button, double x, double y) {
     exitButton->Release(button, x, y, this);
@@ -385,11 +634,30 @@ void Game::Release(double button, double x, double y) {
     insureButton->Release(button, x, y, this);
     dontInsureButton->Release(button, x, y, this);
     dealButton->Release(button, x, y, this);
+    incrementBet->Release(button, x, y, this);
+    decrementBet->Release(button, x, y, this);
+    restartButton->Release(button, x, y, this);
+    okayButton->Release(button, x, y, this);
 }
 Gamestate *Game::getNextState() {
     return nextState;
 }
 Game::~Game() {
+    for (auto &card : playerHand) {
+        delete card;
+    }
+    for (auto &card : dealerHand) {
+        delete card;
+    }
+    for (auto &card : splitHand) {
+        delete card;
+    }
+    for (auto &card : deck) {
+        delete card;
+    }
+    for (auto &card : discard) {
+        delete card;
+    }
     delete exitButton;
     delete hitButton;
     delete standButton;
@@ -399,4 +667,13 @@ Game::~Game() {
     delete dontInsureButton;
     delete dealButton;
     delete visualDistribution;
+    delete winnerLabel;
+    delete splitLabel;
+    delete balanceLabel;
+    delete betLabel;
+    delete incrementBet;
+    delete decrementBet;
+    delete highBetLabel;
+    delete restartButton;
+    delete okayButton;
 }

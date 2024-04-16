@@ -14,7 +14,13 @@
 
 class Game : public Gamestate {
     enum Phase {
-        HIT, STAND, SPLIT, PLAYER_INSURE, INSURE, DEALER, PLAYER, END, SHUFFLE, COLLECTING, DEALING
+        HIT, STAND, SPLIT, PLAYER_INSURE, INSURE, DEALER, PLAYER, END, SHUFFLE, COLLECTING, DEALING, HIGHBET, LOSE
+    };
+    enum SplitPhase {
+        LEFT, RIGHT, NONE
+    };
+    enum HighBetSource {
+        INSURANCE, DOUBLE, START
     };
 public:
     explicit Game(GLFWwindow* window, GLProgram* program, GLProgram* basicProgram, GLProgram *textProgram, Fonts* fonts, Gamestate* menu);
@@ -40,6 +46,7 @@ private:
     Phase phase = SHUFFLE;
     std::vector<VisualCard*> playerHand;
     std::vector<VisualCard*> dealerHand;
+    std::vector<VisualCard*> splitHand;
     std::vector<VisualCard*> deck;
     std::vector<VisualCard*> discard;
     HexicImageButton<Game*>* hitButton;
@@ -51,7 +58,16 @@ private:
     HexicImageButton<Game*>* dealButton;
     HexicImageButton<Game*>* exitButton;
     HexicImageButton<Game*>* winnerLabel;
+    HexicImageButton<Game*>* splitLabel;
+    HexicImageButton<Game*>* balanceLabel;
+    HexicImageButton<Game*>* betLabel;
+    HexicImageButton<Game*>* incrementBet;
+    HexicImageButton<Game*>* decrementBet;
+    HexicImageButton<Game*>* highBetLabel;
+    HexicImageButton<Game*>* restartButton;
+    HexicImageButton<Game*>* okayButton;
     bool isWinner=false;
+    bool isSplit = false;
     bool isFirstRound=true;
     bool shuffleStarted = false;
     bool shuffleFinished = false;
@@ -69,7 +85,17 @@ private:
 
     bool isDouble = false;
 
+    bool rightDoubled=false;
+    bool leftDoubled=false;
+
     bool startCollecting=false;
     double collectTime=0.0;
     double max = 5;
+    SplitPhase split_phase = NONE;
+    double splitTimer=0.0;
+
+    int balance = 1000.0;
+    int bet = 20.0;
+
+    HighBetSource highBetSource = START;
 };
