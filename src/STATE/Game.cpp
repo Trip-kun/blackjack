@@ -533,7 +533,7 @@ void Game::Update(double deltaTime) {
                 }
                 if (hasInsured) {
                     if (countValue(&dealerHand)==21 && dealerHand.size()==2) {
-                        balance+=2*bet;
+                        balance+=1.5*bet;
                     }
                 }
                 winnerLabel->setText((std::string("Left: ") + winner2 + std::string("\nRight: ") + winner1).c_str());
