@@ -55,29 +55,6 @@ Blackjack::Blackjack() {
 
 }
 void Blackjack::Run() {
-    unsigned int* indices = new unsigned int[]{
-        0, 1, 3,
-        1, 2, 3
-        };
-    double* vertices = new double[]{
-         0.2,  0.2, 1.0, 1.0, 1.0,
-         0.2, -0.2, 1.0, 1.0, 1.0,
-        -0.2, -0.2, 1.0, 1.0, 1.0,
-        -0.2,  0.2, 1.0, 1.0, 1.0,
-    };
-    unsigned int VAO, VBO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, 20*sizeof(double), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*sizeof(unsigned int), indices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 5 * sizeof(double), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 5 * sizeof(double), (void*)(2*sizeof(double)));
-    glEnableVertexAttribArray(1);
     while (!glfwWindowShouldClose(window)) {
         processInput();
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -96,7 +73,6 @@ void Blackjack::Run() {
         }
         Shaders::basic->use(context);
         glCullFace(GL_FRONT);
-        glBindVertexArray(VAO);
         glm::mat4 proj = glm::mat4(1.0);
         //glUniformMatrix4fv(Shaders::basic->getUniformLocation("proj"), 1, GL_FALSE, glm::value_ptr(proj));
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -126,6 +102,7 @@ Blackjack::~Blackjack() {
     delete Cards::getCards();
     Shaders::clean(context);
     fonts->clean();
+    KeyMonitor::Clean();
     delete context;
     delete menu;
     delete fonts;

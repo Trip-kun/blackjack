@@ -10,7 +10,6 @@ Menu::Menu(GLFWwindow* window, GLProgram* program, GLProgram* textProgram, GLPro
 
     HexicImageButton<Menu*>::setWidth(1280);
     HexicImageButton<Menu*>::setHeight(720);
-    Texture* buttonTexture = new Texture("img/button_10_3.png");
     startButton = new HexicImageButton<Menu*>(basicProgram, textProgram, fonts, "Start Game!", {-(720.0/1280.0), -0.3, 2*(720.0/1280.0), 0.3}, {1, 1, 1});
     startButton->onClick([](Menu *menu) {
         menu->nextState = menu->game;

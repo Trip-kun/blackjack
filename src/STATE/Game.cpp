@@ -68,12 +68,15 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
     Deck deck1(true), deck2(true), deck3(true), deck4(true), deck5(true), deck6(true);
     Deck deckA(deck1, deck2), deckB(deck3, deck4), deckC(deck5, deck6);
     Deck deckD(deckA, deckB), deckE(deckC, deckD);
+
     VisualCard::setBackImage(Cards::getCards()->getBackImage());
     for (int i=0; i<52*6; i++) {
         Card* card = deckE.pull();
         VisualCard* vcard = new VisualCard(card->getFace(), card->getSuit(), Cards::getCards()->getFrontFace(card->getFace(), card->getSuit()), program, -0.15/ (1280.0/720.0), 0.21, 0.5);
         deck.push_back(vcard);
     }
+    deckD.clean();
+    deckC.clean();
     this->exitButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Exit Game!", {-1, 0.9, 1.0/3.0, 0.1}, {1, 1, 1});
     exitButton->onClick([](Game *game) {
         game->nextState=game->menu;
@@ -114,7 +117,7 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
     });
     this-> splitButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Split", {-(1.0/3.0), -1, 1.0/3.0, 0.1}, {1, 1, 1});
     this->splitButton->onClick([](Game *game) {
-        if (game->phase==PLAYER) {
+        if (game->phase==PLAYER && game->split_phase==NONE && game->playerHand.size()==2) {
             if (game->playerHand[0]->getFace()==game->playerHand[1]->getFace()) {
                 if (game->bet>game->balance) {
                     game->highBetSource=DOUBLE;
@@ -208,6 +211,8 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
                 game->phase=HIGHBET;
                 return;
             }
+            game->leftDoubled=false;
+            game->rightDoubled=false;
             game->balance-=game->bet;
             game->isDouble=false;
             game->phase=DEALING;
@@ -247,7 +252,7 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
             game->phase=SHUFFLE;
         }
     });
-    okayButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Okay", {0, 0, 1.0/3.0, 0.1}, {1, 1, 1});
+    okayButton = new HexicImageButton<Game*>(basicProgram, textProgram, fonts, "Okay", {0, 0.4, 1.0/3.0, 0.1}, {1, 1, 1});
     this->okayButton->onClick([](Game *game) {
         if (game->phase==HIGHBET) {
             if (game->highBetSource==START) {
@@ -295,7 +300,7 @@ void Game::Render(Context *ctx) {
         standButton->Draw(ctx);
         if (playerHand.size()==2) {
             doubleButton->Draw(ctx);
-            if (playerHand[0]->getFace()==playerHand[1]->getFace())
+            if (playerHand[0]->getFace()==playerHand[1]->getFace() && !isSplit)
                 splitButton->Draw(ctx);
         }
         if (split_phase!=NONE) {
@@ -531,9 +536,9 @@ void Game::Update(double deltaTime) {
                     this->balance+=bet* (this->leftDoubled ? 2 : 1);
                     winner2="Push!";
                 }
-                if (hasInsured) {
+                if (this->hasInsured) {
                     if (countValue(&dealerHand)==21 && dealerHand.size()==2) {
-                        balance+=1.5*bet;
+                        this->balance+=3*bet/2;
                     }
                 }
                 winnerLabel->setText((std::string("Left: ") + winner2 + std::string("\nRight: ") + winner1).c_str());
@@ -676,4 +681,5 @@ Game::~Game() {
     delete highBetLabel;
     delete restartButton;
     delete okayButton;
+    VisualCard::Clean();
 }

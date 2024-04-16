@@ -19,6 +19,8 @@ public:
     flipAnim getFlipAnimation();
     moveAnim getMoveAnimation();
     ~VisualCard() override;
+    static Image* getCacheImage(Position pos, GLProgram* program, Card card, bool del);
+    static void Clean();
 private:
     bool isBack = true;
     Image* image;

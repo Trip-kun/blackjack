@@ -51,6 +51,14 @@ public:
     void put(Card* c) {
         discard.push_back(c);
     }
+    void clean() {
+        for (Card* c : internalDeck) {
+            delete c;
+        }
+        for (Card* c : discard) {
+            delete c;
+        }
+    }
     void printAll() {
         std::cout << "Deck: " << std::endl;
         for (Card* c : internalDeck) {

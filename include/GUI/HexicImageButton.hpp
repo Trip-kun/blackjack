@@ -78,6 +78,7 @@ public:
     ~HexicImageButton() override {
         delete button;
         delete text;
+        delete hexic;
     }
 };
 template <typename T>

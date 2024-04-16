@@ -142,3 +142,9 @@ KeyMode KeyMonitor::getState(GLFWwindow* window, KeyFrame *frame, Key key) {
     }
     return RELEASE;
 }
+void KeyMonitor::Clean() {
+    for (auto it = keyMonitors.begin(); it!=keyMonitors.end(); it++) {
+        delete it->second;
+    }
+}
+

@@ -14,10 +14,10 @@ Texture::Texture(const char* filename) {
     this->data = SOIL_load_image(filename, &width, &height, &channels, SOIL_LOAD_AUTO);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, this->data);
     glGenerateMipmap(GL_TEXTURE_2D);
+    SOIL_free_image_data(this->data);
 }
 
 void Texture::releaseImage() {
-    SOIL_free_image_data(this->data);
 }
 void Texture::bind() {
     glActiveTexture(GL_TEXTURE0);

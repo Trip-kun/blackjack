@@ -18,4 +18,5 @@ class KeyMonitor {
     KeyFrame* currentFrame;
 public:
     static KeyMode getState(GLFWwindow* window, KeyFrame* frame, Key key);
+    static void Clean();
 };

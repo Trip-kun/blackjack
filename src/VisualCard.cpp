@@ -1,4 +1,9 @@
 #include "VisualCard.hpp"
+
+#include <map>
+#include <unordered_map>
+#include <vector>
+
 #include "tween.hpp"
 Texture* VisualCard::backImage = nullptr;
 void VisualCard::setBackImage(Texture* texture) {
@@ -11,7 +16,24 @@ VisualCard::VisualCard(Face face, Suit suit, Texture *texture, GLProgram* progra
     this->fullScale=scale;
     this->startX = x;
     this->startY = y;
-    this->image=new Image(texture, program, {x, y, width*scale, height*scale});
+    this->image = getCacheImage({x, y, width*scale, height*scale}, program, Card(suit, face), false);
+}
+Image* VisualCard::getCacheImage(Position pos, GLProgram* program, Card card, bool del) {
+    static std::vector<Image*> cache(52);
+    int c = (card.getFace()*4)+card.getSuit();
+    if (cache[c]==nullptr) {
+        cache[c] = new Image(backImage, program, pos);
+    }
+    if (del) {
+        for (int it = 0; it<cache.size(); it++) {
+            if (cache[it]!=nullptr) {
+                delete cache[it];
+                cache[it]=nullptr;
+            }
+        }
+        return nullptr;
+    }
+    return cache[c];
 }
 void VisualCard::Draw(Context* ctx) {
     std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
@@ -86,9 +108,11 @@ void VisualCard::Move(double x, double y) {
     this->moveAnimation=MOVE;
 }
 
-VisualCard::~VisualCard() {
-    delete image;
+VisualCard::~VisualCard() = default;
+void VisualCard::Clean() {
+    getCacheImage({0, 0, 0, 0}, nullptr, Card(CLUBS, ACE), true);
 }
+
 VisualCard::flipAnim VisualCard::getFlipAnimation() {
     return flipAnimation;
 }

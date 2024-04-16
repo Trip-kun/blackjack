@@ -5,7 +5,8 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
-
+#add_compile_options(-fsanitize=address)
+#add_link_options(-fsanitize=address)
 set (CMAKE_CXX_STANDARD 17)
 add_executable(${PROJECT_NAME} ./src/main.cpp
         src/Blackjack.cpp
