@@ -61,8 +61,7 @@ void VisualCard::Draw(Context* ctx) {
             std::chrono::duration<double> elapsed = now-startFlip;
             flipScale = tween::linear(elapsed.count(), 0.0, 1.0, 0.25);
             flipOffset = tween::linear(elapsed.count(), this->height*this->fullScale/2, 0.0, 0.25);
-            if (flipScale==0) {
-                isBack=!isBack;
+            if (flipScale==1) {
                 this->flipAnimation=NONE;
             }
             break;

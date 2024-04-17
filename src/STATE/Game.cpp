@@ -73,6 +73,7 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
     for (int i=0; i<52*6; i++) {
         Card* card = deckE.pull();
         VisualCard* vcard = new VisualCard(card->getFace(), card->getSuit(), Cards::getCards()->getFrontFace(card->getFace(), card->getSuit()), program, -0.15/ (1280.0/720.0), 0.21, 0.5);
+
         deck.push_back(vcard);
     }
     deckD.clean();
@@ -270,7 +271,14 @@ Game::Game(GLFWwindow *window, GLProgram *program, GLProgram *basicProgram, GLPr
 void Game::Render(Context *ctx) {
     glClearColor((53.0f/255.0f), (101.0f/255.0f), (77.0f/255.0f), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    int c;
+    for (auto it = deck.rbegin(); it!=deck.rend(); it++) {
+        (*it)->Draw(ctx);
+        //if (c++>this->max) break;
+    }
+    for (auto it = discard.rbegin(); it!=discard.rend(); it++) {
+        (*it)->Draw(ctx);
+        //if (c++>this->max) break;
+    }
     for (auto &card : playerHand) {
         card->Draw(ctx);
     }
@@ -279,16 +287,6 @@ void Game::Render(Context *ctx) {
     }
     for (auto &card : splitHand) {
         card->Draw(ctx);
-    }
-    c=0;
-    for (auto &card : deck) {
-        card->Draw(ctx);
-        if (c++>this->max) break;
-    }
-    c=0;
-    for (auto &card : discard) {
-        card->Draw(ctx);
-        if (c++>this->max) break;
     }
     exitButton->Draw(ctx);
     balanceLabel->setText((std::string("Balance: $") + std::to_string(balance)).c_str());

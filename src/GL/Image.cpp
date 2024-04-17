@@ -3,8 +3,9 @@
 Image::Image(Texture* texture, GLProgram* program, Position pos, Color color ) {
     this->texture=texture;
     this->program=program;
-    this->x=pos.x;
-    this->y=pos.y;
+    this->x=0.0;
+    this->y=0.0;
+    this->pos=pos;
     unsigned int* iS = new unsigned int[]{
         0, 1, 3,
         1, 2, 3
@@ -66,7 +67,7 @@ void Image::setTexture(Texture *texture) {
 
 void Image::resetTrans() {
     this->trans = glm::mat4(1.0f);
-    this->trans = glm::translate(trans, glm::vec3(this->x-this->pos.x, this->y-this->pos.y, 0));
+    this->trans = glm::translate(trans, glm::vec3(this->x, this->y, 0));
     this->trans = glm::rotate(trans, (float) glm::radians(this->transform.r), glm::vec3(0.0, 0.0, 1.0));
     this->trans = glm::scale(trans, glm::vec3(this->transform.sx, this->transform.sy, 1));
 }

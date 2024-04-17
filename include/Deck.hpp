@@ -11,12 +11,12 @@ public:
     explicit Deck(bool fill) {
         if (fill) {
             generator.seed(std::time(nullptr));
-            for (int suit =0; suit<4; suit++) {
-                for (int face =0; face<13; face++) {
+            for (int face =0; face<13; face++) {
+                for (int suit =0; suit<4; suit++) {
                     internalDeck.push_back(new Card(static_cast<Card::Suit>(suit), static_cast<Card::Face>(face)));
                 }
             }
-            shuffle();
+            //shuffle();
         }
     }
     Deck(Deck a, Deck b) {
@@ -27,7 +27,7 @@ public:
         for (Card* c : b.internalDeck) {
             internalDeck.push_back(c);
         }
-        shuffle();
+        //shuffle();
     }
     void shuffle() {
         for (Card* c : discard) {
