@@ -500,7 +500,7 @@ void Game::Update(double deltaTime) {
                 {
                 std::string winner1;
                 std::string winner2;
-                if (countValue(&playerHand)==21 && (countValue(&dealerHand)!=21 || dealerHand.size()>2)) {
+                if (playerHand.size()==2 && countValue(&playerHand)==21 && (countValue(&dealerHand)!=21 || dealerHand.size()>2)) {
                     this->balance+=bet*2.5* (this->rightDoubled ? 2 : 1);
                     winner1="Player Blackjack!";
                 } else if (countValue(&playerHand)>21) {
@@ -517,7 +517,7 @@ void Game::Update(double deltaTime) {
                     this->balance+=bet* (this->rightDoubled ? 2 : 1);
                     winner1="Push!";
                 }
-                if (countValue(&splitHand)==21 && (countValue(&dealerHand)!=21 || dealerHand.size()>2)) {
+                if (splitHand.size()==2 &&countValue(&splitHand)==21 &&  (countValue(&dealerHand)!=21 || dealerHand.size()>2)) {
                     this->balance+=2.5*bet* (this->leftDoubled ? 2 : 1);
                     winner2="Player Blackjack!";
                 } else if (countValue(&splitHand)>21) {
